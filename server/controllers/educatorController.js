@@ -29,7 +29,7 @@ export const addCourse = async (req, res) => {
             return res.json({ success: false, message: 'Thumbnail Not Attached' });
         }
 
-        const parsedCourseData = JSON.parse(courseData);
+        const parsedCourseData = await JSON.parse(courseData);
         parsedCourseData.educator = educatorId;
         const newCourse = await Course.create(parsedCourseData);
 
