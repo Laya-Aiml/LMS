@@ -31,7 +31,8 @@ app.use('/api/course', express.json(), courseRouter)
 
 app.use('/api/User', express.json(), userRouter)
 
-app.post('/stripe', express.raw({type:'application/json'}), stripeWebhooks)
+// middleware setup
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
 
 const PORT = process.env.PORT || 5000;
 

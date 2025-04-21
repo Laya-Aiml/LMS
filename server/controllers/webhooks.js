@@ -30,7 +30,7 @@ export const clerkWebhooks = async (req, res) => {
             }
             case 'user.updated': {
                 const userData = {
-                    email: data.email_address[0].email_address,
+                    email: data.email_addresses[0].email_address,
                     name: data.first_name + " " + data.last_name,
                     imageUrl: data.image_url,
                 };
@@ -83,9 +83,10 @@ export const stripeWebhooks = async(request, response) => {
 
             courseData.enrolledStudents.push(userData)
             await courseData.save()
-            userData.enrolledStudents.push(courseData._id)
+            userData.enrolledCourses.push(courseData._id)
             await userData.save()
-
+            
+            
             purchaseData.status = 'completed'
             await purchaseData.save()
             break;
@@ -95,7 +96,7 @@ export const stripeWebhooks = async(request, response) => {
             const paymentIntentId = paymentIntent.id;
         
             const session = await stripeInstance.checkout.sessions.list({
-            payment_intent: paymentIntentId
+                payment_intent: paymentIntentId
             })
             const { purchaseId } = session.data[0].metadata;
             const purchaseData = await Purchase.findById(purchaseId)
