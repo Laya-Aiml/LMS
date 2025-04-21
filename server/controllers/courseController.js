@@ -13,7 +13,7 @@ export const getAllCourse = async (req, res) => {
 }
 
 
-export const getCourseById = async (req, res) => {
+export const getCourseId = async (req, res) => {
     const { id } = req.params;
 
     try {
