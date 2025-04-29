@@ -4,17 +4,36 @@ import { Link } from 'react-router-dom'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { AppContext } from '../../context/AppContext'
 const Navbar = () => {
-  const {navigate, isEducator} = useContext(AppContext)
+  const {navigate, isEducator, backendUrl, setIsEducator, getToken} = useContext(AppContext)
   const isCourseListPage=location.pathname.includes('/course-list');
   const {openSignIn} = useClerk()
   const {user} = useUser()
+  const becomeEducator = async ()=>{
+    try {
+      if(isEducator){
+        navigate('/educator')
+        return;
+      }
+      const token = await getToken()
+      const { data } = await axios.get(backendUrl +'/api/educator/update-role',{headers: {Authorization:`Bearer ${token}`}})
+      if(data.success){
+        setIsEducator(true)
+        toast.success(data.message)
+      }
+      else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
   return (
     /*Header of the home page*/
     <div className={`flex items-center justify-between px-4 sm:px-10 md:px-14 lg:px-36 border-b border-gray-500 py-4 ${isCourseListPage?'bg.white':'bg-red-100/70'}`}>
       <img onClick={()=> navigate('/')} src={assets.logo} alt="Logo" className="w-28 lg:w-32 cursor-pointer" />
       <div className="hidden md:flex items-center gap-5 text-gray-500">
         <div className='flex items-center gap-5'>
-          <button onClick={()=>{navigate('/educator')}}>{isEducator ? 'Educator Dashboard': 'Become Educator'}</button>
+          <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard': 'Become Educator'}</button>
             <div className='w-px h-5 bg-gray-400' />
             <Link to='/my-enrollments'>My Enrollments</Link>
         </div>
@@ -26,7 +45,7 @@ const Navbar = () => {
         <div className='flex items-center gap-1 sm:gap-2 max-sm:text-xs'>
         { user &&
           <>
-            <button onClick={()=>{navigate('/educator')}}>{isEducator ? 'Educator Dashboard': 'Become Educator'}</button>
+            <button onClick={becomeEducator}>{isEducator ? 'Educator Dashboard': 'Become Educator'}</button>
 
             <Link to='/my-enrollments'>My Enrollments</Link>
 

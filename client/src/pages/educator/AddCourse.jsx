@@ -1,11 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import uniqid from 'uniqid';
 import { assets } from '../../assets/assets';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { AppContext } from '../../context/AppContext';
 
 const AddCourse = () => {
     // Refs for rich text editor
+    const { backendUrl, getToken } = useContext(AppContext)
     const quillRef = useRef(null);
     const editorRef = useRef(null);
 
@@ -85,8 +89,54 @@ const AddCourse = () => {
         });
     };
     const handleSubmit = async (e) => {
-      e.preventDefault()
+        e.preventDefault();
+      
+        try {
+          if (!image) {
+            toast.error('Thumbnail Not Selected');
+            return;
+            
+          }
+      
+          const courseData = {
+            courseTitle,
+            courseDescription: quillRef.current.root.innerHTML,
+            coursePrice: Number(coursePrice),
+            discount: Number(discount),
+            courseContent: chapters,
+          };
+      
+          const formData = new FormData();
+          formData.append('courseData', JSON.stringify(courseData));
+          formData.append('image', image);
+      
+          const token = await getToken(); // If you're using auth
+      
+          const { data } = await axios.post(backendUrl+'/api/educator/add-course', formData, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+              
+            }
+          });
+      
+          if (data.success) {
+            toast.success(data.message);
+            // Optionally reset form or redirect
+            setCourseTitle('')
+            setCoursePrice(0)
+            setDiscount(0)
+            setImage(null)
+            setChapters([])
+            quillRef.current.root.innerHTML = ""
+          } else {
+            toast.error(data.message);
+          }
+      
+        } catch (error) {
+          toast.error(error.message || 'Something went wrong');
+        }
     };
+      
     useEffect(() => {
       if (!quillRef.current && editorRef.current) {
           quillRef.current = new Quill(editorRef.current, {
@@ -247,7 +297,7 @@ const AddCourse = () => {
                     <input
                     type="checkbox"
                     className="mt-1 scale-125"
-                    value={lectureDetails.isPreviewFree}
+                    checked={lectureDetails.isPreviewFree}
                     onChange={(e) => setLectureDetails({ ...lectureDetails,
                     isPreviewFree: e.target.checked })}
                     />
