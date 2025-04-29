@@ -255,7 +255,7 @@ const AddCourse = () => {
                 </div>
             ))}
             <div className='flex justify-center items-center bg-blue-100 p-2
-            rounded-lg cursor-pointer' onClick={() => handleChapter('add')}>+ Add Chapter</div>
+            rounded-lg cursor-pointer' onClick={()=> handleChapter('add')}>+ Add Chapter</div>
             {showPopup && (
               <div className='fixed inset-0 flex items-center justify-center
               bg-gray-800 bg-opacity-50'>

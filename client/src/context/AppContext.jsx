@@ -104,6 +104,7 @@ export const AppContextProvider = (props)=>{
 
     useEffect(()=>{
         fetchAllCourses()
+        fetchUserEnrolledCourses()
         
     },[])
     
@@ -115,6 +116,14 @@ export const AppContextProvider = (props)=>{
             fetchUserEnrolledCourses()
         }
     }, [user])
+    const logToken = async ()=>{
+        console.log(await getToken());
+    }
+    useEffect(()=>{
+        if(user){
+            logToken()
+        }
+    },[user])
 
     const value={
         currency, allCourses, navigate, calculateRating,
